@@ -14,7 +14,7 @@ const bot = new Bot(token);
 bot.command("start", async (ctx) => {
   const keyboard = new InlineKeyboard().url(
     "Play Game",
-    "https://candycrushbot.vercel.app/" // Replace with your actual game URL
+    "https://t.me/candycrushtmp_bot/start" // Replace with your actual game URL
   );
 
   await ctx.reply("Welcome! Click the button below to start the game:", {
