@@ -15,7 +15,7 @@ const UserContext = createContext<UserContextProps | undefined>(undefined);
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const account = useActiveAccount()
   if (!account) {
-    throw new Error("No account found");
+    return;
   }
   const [user, setUser] = useState<Models.Document | null>(null);
 

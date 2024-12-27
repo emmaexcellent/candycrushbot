@@ -19,7 +19,7 @@ import { useScore } from "@/lib/context/score";
 export default function Profile() {
   const account = useActiveAccount();
   if (!account) {
-    throw new Error("No account found");
+    return;
   }
   const { disconnect } = useDisconnect();
   const wallet = useActiveWallet();
