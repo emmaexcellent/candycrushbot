@@ -18,9 +18,6 @@ import { useScore } from "@/lib/context/score";
 
 export default function Profile() {
   const account = useActiveAccount();
-  if (!account) {
-    return;
-  }
   const { disconnect } = useDisconnect();
   const wallet = useActiveWallet();
 
@@ -32,7 +29,7 @@ export default function Profile() {
 
   const { data: tokenBalance } = useReadContract(getBalance, {
     contract: contract,
-    address: account.address,
+    address: account?.address || "", // Use an empty string if account is undefined
   });
 
   const { score, setScore } = useScore();
@@ -44,6 +41,14 @@ export default function Profile() {
   };
 
   const claimableTokens = calculateClaimableTokens(score);
+
+  if (!account) {
+    return (
+      <p className="text-center text-white">
+        Please connect your wallet to view your profile.
+      </p>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center">
@@ -60,11 +65,9 @@ export default function Profile() {
             <Wallet className="mr-2" />
             <span>
               Wallet Address:{" "}
-              {account && (
-                <span className="font-bold">
-                  {shortenAddress(account.address)}
-                </span>
-              )}
+              <span className="font-bold">
+                {shortenAddress(account.address)}
+              </span>
             </span>
           </div>
           <div className="flex items-center text-white">
@@ -77,7 +80,9 @@ export default function Profile() {
             <DollarSign className="mr-2" />
             <span>
               Total Points Claimed:{" "}
-              <span className="font-bold">{tokenBalance?.displayValue}</span>
+              <span className="font-bold">
+                {tokenBalance?.displayValue || 0}
+              </span>
             </span>
           </div>
           <div className="flex items-center text-white">
@@ -88,33 +93,31 @@ export default function Profile() {
             </span>
           </div>
         </div>
-        {account && (
-          <div className="flex justify-between items-center">
-            <TransactionButton
-              className="!bg-green-500 text-white"
-              transaction={() =>
-                claimTo({
-                  contract: contract,
-                  to: account.address,
-                  quantity: claimableTokens.toString(),
-                })
-              }
-              onTransactionConfirmed={() => {
-                setScore(score - ((claimableTokens/10)*500));
-                alert(`Successfully claimed ${claimableTokens} tokens!`);
-              }}
-              disabled={claimableTokens === 0} // Disable if no claimable tokens
-            >
-              Claim Tokens
-            </TransactionButton>
-            <button
-              className="bg-red-500 rounded py-1.5 px-3"
-              onClick={() => disconnect(wallet!)}
-            >
-              Log Out
-            </button>
-          </div>
-        )}
+        <div className="flex justify-between items-center">
+          <TransactionButton
+            className="!bg-green-500 text-white"
+            transaction={() =>
+              claimTo({
+                contract: contract,
+                to: account.address,
+                quantity: claimableTokens.toString(),
+              })
+            }
+            onTransactionConfirmed={() => {
+              setScore(score - (claimableTokens / 10) * 500);
+              alert(`Successfully claimed ${claimableTokens} tokens!`);
+            }}
+            disabled={claimableTokens === 0} // Disable if no claimable tokens
+          >
+            Claim Tokens
+          </TransactionButton>
+          <button
+            className="bg-red-500 rounded py-1.5 px-3"
+            onClick={() => disconnect(wallet!)}
+          >
+            Log Out
+          </button>
+        </div>
       </div>
       <Link
         href="/"
