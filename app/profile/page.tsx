@@ -18,6 +18,9 @@ import { useScore } from "@/lib/context/score";
 
 export default function Profile() {
   const account = useActiveAccount();
+  if (!account) {
+    throw new Error("No account found");
+  }
   const { disconnect } = useDisconnect();
   const wallet = useActiveWallet();
 
@@ -29,7 +32,7 @@ export default function Profile() {
 
   const { data: tokenBalance } = useReadContract(getBalance, {
     contract: contract,
-    address: account?.address!,
+    address: account.address,
   });
 
   const { score, setScore } = useScore();

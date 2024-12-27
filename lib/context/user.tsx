@@ -14,12 +14,15 @@ const UserContext = createContext<UserContextProps | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const account = useActiveAccount()
+  if (!account) {
+    throw new Error("No account found");
+  }
   const [user, setUser] = useState<Models.Document | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const user = await fetchUsersByAddress(account?.address!);
+        const user = await fetchUsersByAddress(account.address);
         setUser(user);
       } catch (error) {
         console.error("Failed to fetch user", error);
